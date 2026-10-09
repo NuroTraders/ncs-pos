@@ -1,0 +1,269 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>NCS POS</title>
+<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#2F5D3A"><link rel="apple-touch-icon" href="icon-192.png">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+<script src="config.js"></script>
+<style>
+:root{--bg:#F7F7F5;--card:#fff;--ink:#17181A;--mut:#80848A;--line:#E8E8E4;--acc:#2F5D3A;--soft:#E9F0EA;--gold:#B7862F;--pos:#2F7D46;--neg:#C23B3B;--btnink:#fff;color-scheme:light dark}
+@media (prefers-color-scheme:dark){:root{--bg:#0E0F10;--card:#17181A;--ink:#F1F1EF;--mut:#8C9096;--line:#26282B;--acc:#8FC79B;--soft:#1C2A20;--gold:#E0B25C;--pos:#6FCF8A;--neg:#F08585;--btnink:#0E0F10}}
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 Inter,"Noto Sans Bengali",system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;-webkit-font-smoothing:antialiased}
+button,input,select{font:inherit;color:inherit}
+input,select{background:var(--bg);border:1px solid var(--line);border-radius:10px;height:40px;padding:0 10px;width:100%}
+input:focus,select:focus{outline:2px solid var(--acc);outline-offset:-1px;border-color:transparent}
+.app{max-width:1100px;margin:0 auto;padding:16px 14px 90px}
+header{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+.shop{color:var(--mut);font-size:12.5px}h1{margin:0;font-size:22px;letter-spacing:-.02em}
+.seg{display:flex;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:3px}
+.seg button{border:0;background:none;padding:8px 20px;border-radius:9px;cursor:pointer;font-weight:600;color:var(--mut)}
+.seg button.on{background:var(--acc);color:var(--btnink)}
+.nav{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.ghost{background:var(--card);border:1px solid var(--line);border-radius:10px;height:36px;padding:0 12px;cursor:pointer;font-size:13.5px}
+.ghost:hover{border-color:var(--mut)}
+.chip{font-size:12px;color:var(--mut);padding:0 6px}
+.go{height:44px;border:0;border-radius:11px;background:var(--acc);color:var(--btnink);font-weight:600;padding:0 22px;cursor:pointer;width:100%}
+.go:disabled{opacity:.4;cursor:default}
+.cols{display:grid;grid-template-columns:1fr 390px;gap:14px;align-items:start}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px}
+.tools{display:flex;gap:8px;margin-bottom:10px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(135px,1fr));gap:8px}
+.tile{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px;text-align:left;cursor:pointer;min-height:70px}
+.tile:hover{border-color:var(--acc)}.tile span{display:block;font-weight:500;line-height:1.3}.tile small{color:var(--mut)}
+.empty{padding:26px;text-align:center;color:var(--mut)}
+.cart{padding:14px}.cart h3{margin:0 0 6px;font-size:15px}
+.line{display:grid;grid-template-columns:1fr 78px auto 62px 22px;gap:6px;align-items:center;padding:9px 0;border-top:1px solid var(--line)}
+.line input{height:34px;padding:0 6px;text-align:right}
+.qty{display:flex;align-items:center;gap:4px}.qty button,.x{border:1px solid var(--line);background:var(--card);border-radius:8px;width:28px;height:28px;cursor:pointer}
+.x{border:0;color:var(--mut);width:22px}.lt{text-align:right;font-variant-numeric:tabular-nums;font-weight:600}
+.tot{display:flex;justify-content:space-between;align-items:center;padding:6px 0;color:var(--mut)}
+.tot b{color:var(--ink);font-variant-numeric:tabular-nums}.tot.big{font-size:20px;color:var(--ink);font-weight:700}
+.tot input{width:90px;text-align:right;height:32px}
+.fab{display:none}
+.ov{position:fixed;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;padding:14px;z-index:9}
+.ov[hidden]{display:none}.ov.lk{background:var(--bg);z-index:20}
+.dlg{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px;width:100%;max-width:420px;max-height:92vh;overflow:auto}
+.dlg h3{margin:0 0 10px}.f{margin-bottom:10px}label{display:block;font-size:12.5px;color:var(--mut);margin-bottom:4px}
+.oa{display:flex;justify-content:flex-end;gap:8px;margin-top:12px}.oa .go{width:auto}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.chips button{border:1px solid var(--line);background:var(--bg);border-radius:20px;padding:6px 14px;cursor:pointer}
+.chips button.on{background:var(--acc);color:var(--btnink);border-color:var(--acc)}
+.dn{display:grid;grid-template-columns:56px 34px 1fr 34px;gap:6px;align-items:center;margin-bottom:5px}
+.dn button{border:1px solid var(--line);background:var(--card);border-radius:8px;height:34px;cursor:pointer;font-size:16px}
+.dn b{text-align:center;font-variant-numeric:tabular-nums}.dn input{height:34px;text-align:center}
+.ok{color:var(--pos)}.bad{color:var(--neg)}.mut{color:var(--mut);font-size:13px}
+.row{display:flex;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px solid var(--line);font-size:14px}
+#sc video{width:100%;border-radius:12px;background:#000}
+.toast{position:fixed;left:50%;bottom:84px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:8px 16px;border-radius:20px;font-size:13.5px;z-index:30}
+#rcp{display:none;white-space:pre;font:13px/1.4 monospace}@media print{body.pr .app,body.pr .ov{display:none!important}body.pr #rcp{display:block}}
+@media(max-width:800px){.cols{grid-template-columns:1fr}.line{grid-template-columns:1fr 70px auto 54px 20px}.fab{display:block;position:fixed;left:14px;right:14px;bottom:calc(14px + env(safe-area-inset-bottom,0px));z-index:5}}
+</style>
+</head>
+<body>
+<div class="app" id="app" hidden>
+  <header>
+    <div><div class="shop">Nur Computer &amp; Stationary</div><h1>POS</h1></div>
+    <div class="seg"><button id="mS" class="on">Sale</button><button id="mP">Purchase</button></div>
+    <div class="nav"><span class="chip" id="who"></span><span class="chip" id="chip"></span><button class="ghost" id="bHeld">Held</button><button class="ghost" id="bBills">Bills</button><button class="ghost" id="bDrawer">Drawer</button><button class="ghost" id="bLock">Lock</button></div>
+  </header>
+  <div class="cols">
+    <section>
+      <div class="tools"><input id="q" placeholder="Search name, or scan / type barcode and press Enter" autocomplete="off"><button class="ghost" id="bScan">Scan</button><button class="ghost" id="bNew">+ Product</button></div>
+      <div class="grid" id="grid"></div>
+    </section>
+    <section class="card cart">
+      <h3 id="ct">Sale cart</h3>
+      <div id="lines"></div>
+      <div class="tot"><span>Subtotal</span><b id="st">0</b></div>
+      <div class="tot"><span>Discount</span><input id="dc" type="number" inputmode="decimal" min="0" placeholder="0"></div>
+      <div class="tot big"><span>Total</span><b id="tt">৳0</b></div>
+      <div style="display:flex;gap:8px;margin:8px 0"><button class="ghost" id="bHold" style="flex:1">Hold bill</button><button class="ghost" id="bCustom" style="flex:1">+ Custom item</button></div>
+      <button class="go" id="bPay">Charge</button>
+    </section>
+  </div>
+  <button class="go fab" id="fab">Charge</button>
+</div>
+<div class="ov" id="ov" hidden><div class="dlg"><h3 id="ot"></h3><div id="ob"></div><div class="oa"><button class="ghost" id="oc">Cancel</button><button class="go" id="ok">OK</button></div></div></div>
+<div class="ov" id="sc" hidden><div class="dlg"><h3>Scan barcode</h3><video id="vid" playsinline muted></video><div class="oa"><button class="ghost" id="scx">Close</button></div></div></div>
+<div id="rcp"></div>
+<div class="ov lk" id="lk" hidden></div>
+<script>
+const KEY='ncs_pos_v1',SESS='ncs_pos_session',$=id=>document.getElementById(id);
+let P;try{P=JSON.parse(localStorage.getItem(KEY))}catch(e){}
+P=Object.assign({sync:null,users:null,products:[],bills:[],queue:[],seq:0,drawer:{}},P||{});
+P.dev=P.dev||String.fromCharCode(65+Math.floor(Math.random()*26));
+const persist=()=>{try{localStorage.setItem(KEY,JSON.stringify(P))}catch(e){}};
+const ENC=(window.NCS_CONFIG||{}).enc,DEN=[1000,500,200,100,50,20,10,5,2,1];
+const n=v=>Number(v).toLocaleString('en-US'),tk=v=>'৳'+n(v);
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const iso=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+const nowT=()=>{const x=new Date();return String(x.getHours()).padStart(2,'0')+':'+String(x.getMinutes()).padStart(2,'0')};
+const t12=t=>{const h=+t.slice(0,2);return ((h+11)%12+1)+':'+t.slice(3,5)+' '+(h<12?'AM':'PM')};
+let U=null,exp=0,C={mode:'sale',lines:[],disc:0};
+
+/* ---- crypto (same scheme as the accounts app) ---- */
+const ub=x=>Uint8Array.from(atob(x),c=>c.charCodeAt(0));
+async function H(p,salt){const b=new TextEncoder().encode(salt+':'+p);const d=await crypto.subtle.digest('SHA-256',b);return [...new Uint8Array(d)].map(x=>x.toString(16).padStart(2,'0')).join('')}
+async function decCfg(e,pw){const k0=await crypto.subtle.importKey('raw',new TextEncoder().encode(pw),'PBKDF2',false,['deriveKey']);const k=await crypto.subtle.deriveKey({name:'PBKDF2',salt:ub(e.s),iterations:e.n,hash:'SHA-256'},k0,{name:'AES-GCM',length:256},false,['decrypt']);return JSON.parse(new TextDecoder().decode(await crypto.subtle.decrypt({name:'AES-GCM',iv:ub(e.i)},k,ub(e.c))))}
+
+/* ---- dialogs ---- */
+function ask(title,body,onOk,okText,hideOk){$('ob').onclick=null;$('ob').oninput=null;$('ot').textContent=title;$('ob').innerHTML=body;$('ok').textContent=okText||'OK';$('ok').style.display=hideOk?'none':'';$('ov').hidden=false;
+  $('ok').onclick=async()=>{if(await onOk()!==false)$('ov').hidden=true};const f=$('ob').querySelector('input:not([type=number]),select');if(f)f.focus()}
+$('oc').onclick=()=>$('ov').hidden=true;
+function toast(t){const d=document.createElement('div');d.className='toast';d.textContent=t;document.body.appendChild(d);setTimeout(()=>d.remove(),1800)}
+
+/* ---- login ---- */
+function lockUI(mode,msg){const lk=$('lk');lk.hidden=false;
+  const F=(id,l,t)=>`<div class="f"><label>${l}</label><input id="${id}" type="${t||'password'}" autocomplete="off" ${t?'':'inputmode="numeric"'}></div>`;
+  let h,btn='Unlock',title='Sign in';
+  if(mode==='connect'){title='Connect to shop';btn='Connect';h='<p>Enter the shop passphrase. You only need to do this once on this device.</p>'+F('pw','Shop passphrase')}
+  else if(mode==='msg'){title='Not ready';btn='Retry';h='<p>'+esc(msg)+'</p>'}
+  else h=`<div class="f"><label>User</label><select id="lu"><option value="admin">Admin</option>${P.users.staff.filter(x=>x.on).map(x=>`<option value="${x.id}">${esc(x.name)}</option>`).join('')}</select></div>`+F('pin','PIN');
+  lk.innerHTML=`<div class="dlg"><h3>${title}</h3>${h}<div id="le" class="bad"></div><div class="oa"><button class="go" id="lgo">${btn}</button></div></div>`;
+  const v=id=>$(id)?$(id).value:'',err=t=>$('le').textContent=t;
+  const f=$('pw')||$('pin');if(f)f.focus();
+  const go=async()=>{
+    if(mode==='msg')return start();
+    if(mode==='connect'){try{const c=await decCfg(ENC,v('pw'));P.sync={url:c.url,key:c.key};persist();return start()}catch(e){return err('Wrong passphrase')}}
+    const L=P.fail||{n:0,until:0};if(Date.now()<L.until)return err('Too many attempts. Try again in a minute.');
+    const id=v('lu'),st=P.users.staff.find(x=>x.id==id),o=id==='admin'?P.users.admin:st;
+    if(o&&(await H(v('pin'),o.s))===o.h){P.fail=null;U={name:id==='admin'?'Admin':st.name,role:id==='admin'?'admin':'staff',id};exp=Date.now()+864e5;
+      try{localStorage.setItem(SESS,JSON.stringify({u:U,exp,h:o.h}))}catch(e){}persist();enter()}
+    else{L.n++;if(L.n>=5){L.until=Date.now()+60000;L.n=0}P.fail=L;persist();err('Wrong PIN')}};
+  $('lgo').onclick=go;lk.onkeydown=e=>{if(e.key==='Enter')go()}}
+const getRemote=async()=>(await fetch(P.sync.url+(P.sync.url.includes('?')?'&':'?')+'action=pull&key='+encodeURIComponent(P.sync.key))).json();
+function resume(){try{const q=JSON.parse(localStorage.getItem(SESS)||'null');if(!q||Date.now()>q.exp)return false;
+  const r=q.u.role==='admin'?P.users.admin:P.users.staff.find(x=>x.id==q.u.id&&x.on);if(!r||r.h!==q.h)return false;U=q.u;exp=q.exp;enter();return true}catch(e){return false}}
+async function start(){
+  if(!P.sync){if(ENC)return lockUI('connect');return lockUI('msg','Sync setup is missing. Copy config.js from the accounts app into this app.')}
+  try{const r=await getRemote();if(r.ok===false){P.sync=null;persist();return ENC?lockUI('connect'):lockUI('msg','Sync key rejected.')}
+    if(r.ok&&r.state){const u=JSON.parse(r.state).users;if(u){P.users=u;persist()}}}catch(e){}
+  if(!P.users)return lockUI('msg','Create the admin PIN in the accounts app first, and check your internet connection.');
+  if(resume())return;lockUI('login')}
+function lock(){try{localStorage.removeItem(SESS)}catch(e){}U=null;$('app').hidden=true;$('ov').hidden=true;start()}
+setInterval(()=>{if(U&&Date.now()>exp)lock()},60000);
+function enter(){$('lk').hidden=true;$('lk').innerHTML='';$('app').hidden=false;$('who').textContent=U.name;renderGrid();renderCart();flush();syncCat()}
+
+/* ---- catalog and cart ---- */
+const sub=()=>C.lines.reduce((s,l)=>s+l.price*l.qty,0),total=()=>Math.max(0,Math.round((sub()-(+C.disc||0))*100)/100);
+function renderGrid(){const q=$('q').value.trim().toLowerCase();
+  const L=P.products.filter(p=>!p.del&&(!q||p.name.toLowerCase().includes(q)||(p.barcode||'').includes(q))).sort((a,b)=>(b.n||0)-(a.n||0)||a.name.localeCompare(b.name)).slice(0,60);
+  $('grid').innerHTML=L.length?L.map(p=>`<button class="tile" data-p="${p.id}"><span>${esc(p.name)}</span><small>${tk(p.price)}</small></button>`).join('')+'<div class="mut" style="grid-column:1/-1">Long-press or right-click a product to edit or delete it.</div>':'<div class="empty">No products yet. Tap + Product, scan a barcode, or use Custom item.</div>'}
+function addLine(p){const l=p.id&&C.lines.find(x=>x.pid===p.id);if(l)l.qty++;else C.lines.push({pid:p.id||null,name:p.name,price:+p.price||0,qty:1});
+  if(p.id){p.n=(p.n||0)+1;persist()}renderCart()}
+function renderCart(){const pm=C.mode==='purchase';
+  $('ct').textContent=pm?'Purchase cart':'Sale cart';$('bHeld').textContent='Held'+((P.held||[]).length?' ('+P.held.length+')':'');$('mS').classList.toggle('on',!pm);$('mP').classList.toggle('on',pm);
+  $('lines').innerHTML=C.lines.length?C.lines.map((l,i)=>`<div class="line"><div>${esc(l.name)}</div><input type="number" inputmode="decimal" min="0" data-pr="${i}" value="${l.price}"><div class="qty"><button data-a="m" data-i="${i}">−</button><b>${l.qty}</b><button data-a="p" data-i="${i}">+</button></div><div class="lt">${n(l.price*l.qty)}</div><button class="x" data-a="x" data-i="${i}">×</button></div>`).join(''):'<div class="empty">Cart is empty</div>';
+  $('st').textContent=n(sub());$('tt').textContent=tk(total());$('dc').value=C.disc||'';
+  const t=pm?'Pay ':'Charge ',c=C.lines.reduce((s,l)=>s+l.qty,0);$('bPay').textContent=t+tk(total());$('bPay').disabled=!c;$('fab').textContent=c?t+tk(total())+' · '+c+' item'+(c>1?'s':''):'Cart is empty';$('fab').disabled=!c}
+$('grid').addEventListener('click',e=>{const b=e.target.closest('[data-p]');if(b)addLine(P.products.find(p=>p.id==b.dataset.p))});
+$('lines').addEventListener('click',e=>{const b=e.target.closest('[data-a]');if(!b)return;const i=+b.dataset.i,l=C.lines[i];
+  if(b.dataset.a==='p')l.qty++;else if(b.dataset.a==='m'){if(--l.qty<1)C.lines.splice(i,1)}else C.lines.splice(i,1);renderCart()});
+$('lines').addEventListener('change',e=>{if(e.target.dataset.pr!=null){C.lines[+e.target.dataset.pr].price=+e.target.value||0;renderCart()}});
+$('dc').addEventListener('change',()=>{C.disc=+$('dc').value||0;renderCart()});
+$('mS').onclick=()=>{C.mode='sale';renderCart()};$('mP').onclick=()=>{C.mode='purchase';renderCart()};
+$('q').addEventListener('input',renderGrid);
+$('q').addEventListener('keydown',e=>{if(e.key!=='Enter')return;const v=$('q').value.trim();if(!v)return;handleCode(v,true);$('q').value='';renderGrid()});
+function handleCode(code,typed){const p=P.products.find(x=>!x.del&&x.barcode&&x.barcode===code);
+  if(p){addLine(p);toast('Added '+p.name);return}
+  if(typed){const m=P.products.filter(x=>!x.del&&x.name.toLowerCase().includes(code.toLowerCase()));if(m.length===1){addLine(m[0]);return}if(m.length>1||!/^\d{6,}$/.test(code))return}
+  newProduct(code)}
+function newProduct(code){ask('New product',`<div class="f"><label>Name</label><input id="np1"></div><div class="f"><label>Barcode (optional)</label><input id="np2" value="${esc(code||'')}"></div><div class="f"><label>Price</label><input id="np3" type="number" inputmode="decimal" min="0"></div>`,()=>{
+  const nm=$('np1').value.trim();if(!nm)return false;const p={id:Date.now(),name:nm,barcode:$('np2').value.trim(),price:+$('np3').value||0,n:0,u:Date.now()};P.products.push(p);persist();addLine(p);renderGrid();syncCat(true)},'Save and add')}
+$('bNew').onclick=()=>newProduct('');
+function editProduct(p){ask('Edit product',`<div class="f"><label>Name</label><input id="ep1" value="${esc(p.name)}"></div><div class="f"><label>Barcode</label><input id="ep2" value="${esc(p.barcode||'')}"></div><div class="f"><label>Price</label><input id="ep3" type="number" inputmode="decimal" min="0" value="${p.price}"></div><button class="ghost" id="epd" style="color:var(--neg)">Delete product</button>`,()=>{const nm=$('ep1').value.trim();if(!nm)return false;Object.assign(p,{name:nm,barcode:$('ep2').value.trim(),price:+$('ep3').value||0,u:Date.now()});persist();renderGrid();syncCat(true)},'Save');
+  $('ob').onclick=e=>{if(e.target.id==='epd'){p.del=1;p.u=Date.now();persist();renderGrid();syncCat(true);$('ov').hidden=true}}}
+$('grid').addEventListener('contextmenu',e=>{const b=e.target.closest('[data-p]');if(b){e.preventDefault();editProduct(P.products.find(p=>p.id==b.dataset.p))}});
+async function syncCat(push){if(!P.sync)return;
+  try{const r=await(await fetch(P.sync.url+(P.sync.url.includes('?')?'&':'?')+'action=catalog&key='+encodeURIComponent(P.sync.key))).json();if(!r.ok)return;
+    const m={};[...(r.items||[]),...P.products].forEach(p=>{const o=m[p.id];if(!o||(p.u||0)>(o.u||0))m[p.id]=Object.assign({},p)});
+    const merged=Object.values(m),k=a=>JSON.stringify(a.map(p=>[p.id,p.u||0,!!p.del]).sort()),same=k(merged)===k(r.items||[]);
+    P.products=merged;persist();renderGrid();
+    if(push||!same)await fetch(P.sync.url,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({key:P.sync.key,action:'catalog',items:merged})})
+  }catch(e){}}
+setInterval(()=>{if(U)syncCat()},60000);
+$('bCustom').onclick=()=>ask('Custom item',`<div class="f"><label>Item name</label><input id="ci1"></div><div class="f"><label>Price</label><input id="ci2" type="number" inputmode="decimal" min="0"></div>`,()=>{const nm=$('ci1').value.trim();if(!nm)return false;addLine({name:nm,price:+$('ci2').value||0})},'Add');
+
+/* ---- barcode camera ---- */
+let stream=null,scanning=false;
+function stopScan(){scanning=false;if(stream)stream.getTracks().forEach(t=>t.stop());stream=null;$('sc').hidden=true}
+$('scx').onclick=stopScan;
+$('bScan').onclick=async()=>{
+  if(!('BarcodeDetector' in window))return ask('Scan barcode','<p>Camera scanning needs Chrome on Android. You can also use a USB or Bluetooth barcode scanner, or type the code in the search box.</p>',()=>{},'OK');
+  try{stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}})}catch(e){return ask('Scan barcode','<p>Camera access was blocked. Allow the camera for this site and try again.</p>',()=>{},'OK')}
+  $('sc').hidden=false;const v=$('vid');v.srcObject=stream;await v.play();scanning=true;const det=new BarcodeDetector();
+  const loop=async()=>{if(!scanning)return;try{const r=await det.detect(v);if(r.length){const c=r[0].rawValue;stopScan();handleCode(c);return}}catch(e){}requestAnimationFrame(loop)};loop()};
+
+/* ---- checkout with note/coin tracking ---- */
+const split=x=>{const o={};x=Math.round(x);DEN.forEach(d=>{const c=Math.floor(x/d);if(c){o[d]=c;x-=c*d}});return o};
+const sumD=o=>DEN.reduce((s,d)=>s+d*(o[d]||0),0),txtD=o=>DEN.filter(d=>o[d]).map(d=>o[d]+'×'+d).join('  ')||'—';
+function checkout(){const T=total();if(!C.lines.length)return;const pm=C.mode==='purchase';
+  const ck={pay:'Cash',rec:{},party:'',phone:''};
+  const draw=()=>{const rec=sumD(ck.rec),ch=rec-T,cash=ck.pay==='Cash';
+    $('ob').innerHTML=`<div class="tot big"><span>${pm?'To pay':'Total'}</span><b>${tk(T)}</b></div><div class="chips">${['Cash','Mobile Banking','Bank','Due'].map(x=>`<button data-pay="${x}" class="${ck.pay===x?'on':''}">${x}</button>`).join('')}</div>`+
+    (ck.pay==='Due'?`<div class="f"><label>${pm?'Supplier name':'Customer name'}</label><input id="cpn" value="${esc(ck.party)}"></div><div class="f"><label>Phone (optional)</label><input id="cph" value="${esc(ck.phone)}"></div>`:'')+
+    (cash?`<label>${pm?'Notes and coins paid out':'Notes and coins received'} <button class="ghost" data-exact="1" style="height:26px;font-size:12px">Exact</button></label>`+DEN.map(d=>`<div class="dn"><span>${d}</span><button data-m="${d}">−</button><b>${ck.rec[d]||0}</b><button data-pl="${d}">+</button></div>`).join('')+
+      `<div class="row"><span>${pm?'Paid':'Received'}</span><b>${tk(rec)}</b></div>`+(ch>=0?`<div class="row"><span>${pm?'Change from supplier':'Change to give'}</span><b class="ok">${tk(ch)}</b></div>${ch?`<div class="mut">${txtD(split(ch))}</div>`:''}`:`<div class="row bad"><span>Short by</span><b>${tk(-ch)}</b></div>`):'');
+    ck.ok=cash?rec>=T:true};
+  draw();
+  ask(pm?'Pay supplier':'Charge',' ',async()=>{
+    if(ck.pay==='Due'&&!ck.party.trim())return false;
+    if(ck.pay==='Cash'&&!ck.ok)return false;
+    finishBill(ck);toast('Saved')},pm?'Confirm payment':'Confirm sale');
+  draw();
+  $('ob').oninput=e=>{if(e.target.id==='cpn')ck.party=e.target.value;if(e.target.id==='cph')ck.phone=e.target.value};
+  $('ob').onclick=e=>{const b=e.target.closest('button');if(!b)return;const d=b.dataset;
+    if(d.pay)ck.pay=d.pay;if(d.pl)ck.rec[d.pl]=(ck.rec[d.pl]||0)+1;if(d.m)ck.rec[d.m]=Math.max(0,(ck.rec[d.m]||0)-1);if(d.exact)ck.rec=split(T);draw()}}
+function finishBill(ck){const pm=C.mode==='purchase',T=total(),rec=ck.pay==='Cash'?ck.rec:{},chg=ck.pay==='Cash'?split(sumD(ck.rec)-T):{};
+  const no=P.dev+(++P.seq),items=C.lines.map(l=>l.qty+'× '+l.name).join(', ');
+  const b={id:Date.now()*1000+Math.floor(Math.random()*1000),no,d:iso(new Date()),t:nowT(),user:U.name,mode:C.mode,desc:'POS #'+no+': '+items,lines:C.lines,disc:+C.disc||0,total:T,pay:ck.pay,party:ck.pay==='Due'?ck.party.trim():'',phone:ck.pay==='Due'?ck.phone.trim():'',rec,chg};
+  const s=pm?-1:1;DEN.forEach(d=>{const v=(P.drawer[d]||0)+s*((rec[d]||0)-(chg[d]||0));P.drawer[d]=Math.max(0,v)});
+  P.bills.unshift(b);P.bills=P.bills.slice(0,300);P.queue.push(b);persist();
+  C.lines=[];C.disc=0;renderCart();flush()}
+$('bPay').onclick=checkout;$('fab').onclick=checkout;
+
+/* ---- bills and drawer ---- */
+function rtext(b){const W=32,ln=(a,c)=>(a.length>W-c.length-1?a.slice(0,W-c.length-1):a).padEnd(W-c.length)+c,dt=b.d.split('-').reverse().join('.')+' '+t12(b.t);
+  return ['NUR COMPUTER & STATIONARY',(b.mode==='purchase'?'Purchase':'Bill')+' #'+b.no,dt,'Cashier: '+b.user,'-'.repeat(W),...b.lines.map(l=>ln(l.qty+'x '+l.name,n(l.price*l.qty))),'-'.repeat(W),...(b.disc?[ln('Discount','-'+n(b.disc))]:[]),ln('TOTAL',n(b.total)),'Paid by '+b.pay+(b.party?' ('+b.party+')':''),b.void?'*** VOID ***':'','Thank you'].filter(x=>x!=='').join('\n')}
+function receipt(b){const t=rtext(b);ask('Receipt','<pre style="font:13px monospace;white-space:pre-wrap;margin:0 0 10px">'+esc(t)+'</pre><div class="chips"><button data-sh="1">Share</button><button data-cp="1">Copy</button><button data-pt="1">Print</button></div>',()=>{},'Close',true);
+  $('ob').onclick=async e=>{const x=e.target.closest('button');if(!x)return;
+    if(x.dataset.sh){try{await navigator.share({text:t})}catch(err){}}
+    if(x.dataset.cp){try{await navigator.clipboard.writeText(t);toast('Copied')}catch(err){}}
+    if(x.dataset.pt){$('rcp').textContent=t;document.body.classList.add('pr');try{window.print()}catch(err){}setTimeout(()=>document.body.classList.remove('pr'),800)}}}
+function voidBill(b){ask('Void bill #'+b.no,'<div class="f"><label>Reason (required)</label><input id="vr"></div><p class="mut">The matching entry in the accounts app is voided too.</p>',()=>{const r=$('vr').value.trim();if(!r)return false;
+  b.void=1;b.vr=r;const s=b.mode==='purchase'?-1:1;DEN.forEach(d=>{P.drawer[d]=Math.max(0,(P.drawer[d]||0)-s*((b.rec[d]||0)-(b.chg[d]||0)))});
+  P.queue.push({id:Date.now()*1000+Math.floor(Math.random()*1000),voidOf:b.id,no:b.no,d:iso(new Date()),t:nowT(),user:U.name,mode:'void',desc:'VOID #'+b.no+': '+r,total:0,pay:'-',reason:r});
+  persist();flush();toast('Voided');setTimeout(billsUI,0)},'Void bill')}
+function billsUI(){const td=iso(new Date()),L=P.bills.filter(b=>b.d===td),A=L.filter(b=>!b.void),sum=m=>A.filter(b=>b.mode===m).reduce((s,b)=>s+b.total,0),bt='style="height:26px;font-size:12px"';
+  ask("Today's bills",`<div class="row"><span>Sales</span><b>${tk(sum('sale'))}</b></div><div class="row"><span>Purchases</span><b>${tk(sum('purchase'))}</b></div>`+(L.length?L.map(b=>`<div class="row"><span>#${esc(b.no)} · ${t12(b.t)} · ${esc(b.pay)}${b.void?' · <b class="bad">VOID</b>':''}<br><small class="mut">${esc(b.user)}${b.mode==='purchase'?' · Purchase':''}${P.queue.some(q=>q.id===b.id)?' · waiting to sync':''}</small><br><button class="ghost" data-rc="${b.id}" ${bt}>Receipt</button>${U.role==='admin'&&!b.void?` <button class="ghost" data-vd="${b.id}" ${bt}>Void</button>`:''}</span><b>${tk(b.total)}</b></div>`).join(''):'<div class="empty">No bills today</div>'),()=>{},'Close',true);
+  $('ob').onclick=e=>{const r=e.target.closest('[data-rc]'),v=e.target.closest('[data-vd]');if(r)receipt(P.bills.find(b=>b.id==r.dataset.rc));if(v)voidBill(P.bills.find(b=>b.id==v.dataset.vd))}}
+$('bBills').onclick=billsUI;
+$('bHold').onclick=()=>{if(!C.lines.length)return;P.held=P.held||[];P.held.unshift({id:Date.now(),mode:C.mode,lines:C.lines,disc:C.disc,t:nowT()});C.lines=[];C.disc=0;persist();renderCart();toast('Bill held')};
+function heldUI(){const H=P.held||[],bt='style="height:28px;font-size:12px"';
+  ask('Held bills',H.length?H.map(h=>`<div class="row"><span>${t12(h.t)} · ${h.lines.reduce((s,l)=>s+l.qty,0)} items · ${tk(h.lines.reduce((s,l)=>s+l.price*l.qty,0))}${h.mode==='purchase'?' · Purchase':''}</span><span><button class="ghost" data-rs="${h.id}" ${bt}>Resume</button> <button class="ghost" data-dh="${h.id}" ${bt}>Delete</button></span></div>`).join(''):'<div class="empty">No held bills</div>',()=>{},'Close',true);
+  $('ob').onclick=e=>{const r=e.target.closest('[data-rs]'),d=e.target.closest('[data-dh]');
+    if(r){const h=H.find(x=>x.id==r.dataset.rs);if(C.lines.length)P.held.unshift({id:Date.now(),mode:C.mode,lines:C.lines,disc:C.disc,t:nowT()});P.held=P.held.filter(x=>x.id!==h.id);C={mode:h.mode,lines:h.lines,disc:h.disc};persist();renderCart();$('ov').hidden=true}
+    if(d){P.held=P.held.filter(x=>x.id!=d.dataset.dh);persist();heldUI()}}}
+$('bHeld').onclick=heldUI;
+$('bDrawer').onclick=()=>{ask('Drawer notes and coins',DEN.map(d=>`<div class="row"><span>${d}</span><b>${P.drawer[d]||0}</b><span class="mut">${tk(d*(P.drawer[d]||0))}</span></div>`).join('')+`<div class="row"><b>Total</b><b>${tk(sumD(P.drawer))}</b></div><p class="mut">Tracks cash taken and given in this app. Set it to your real counted notes to start or correct.</p>`,()=>{
+  ask('Set drawer counts',DEN.map(d=>`<div class="dn"><span>${d}</span><span></span><input type="number" min="0" inputmode="numeric" data-dd="${d}" value="${P.drawer[d]||0}"><span></span></div>`).join(''),()=>{DEN.forEach(d=>{P.drawer[d]=Math.max(0,+$('ob').querySelector('[data-dd="'+d+'"]').value||0)});persist()},'Save');return false},'Set counts')};
+
+/* ---- sync of bills to the shop sheet ---- */
+let busy=false;
+function chip(t){$('chip').textContent=t}
+async function flush(){if(!P.sync||busy)return;if(!P.queue.length)return chip('Synced');busy=true;let ok=true;
+  for(const b of [...P.queue]){try{const r=await(await fetch(P.sync.url,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({key:P.sync.key,action:'bill',bill:b})})).json();
+    if(r.ok){P.queue=P.queue.filter(x=>x.id!==b.id);persist()}else{ok=false;break}}catch(e){ok=false;break}}
+  busy=false;chip(P.queue.length?(ok?'Pending ':'Offline · ')+P.queue.length:'Synced')}
+setInterval(flush,20000);addEventListener('online',flush);
+$('bLock').onclick=lock;
+start();
+if('serviceWorker' in navigator)addEventListener('load',()=>navigator.serviceWorker.register('sw.js'));
+</script>
+</body>
+</html>
